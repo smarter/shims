@@ -1,6 +1,8 @@
 // cats
 package shims
 
+import _root_.cats.data.Xor
+
 private[shims] trait LowPriorityImplicits3 {
 
   implicit def functor1[F[_]](implicit F: _root_.cats.Functor[F]): Functor[F] = new Functor[F] {
@@ -60,6 +62,23 @@ private[shims] trait LowPriorityImplicits1 extends LowPriorityImplicits2 {
 }
 
 trait Implicits extends LowPriorityImplicits1 {
+
+  implicit object either extends EitherLike[Xor] {
+
+    def flatMap[A, B, C](e: Xor[A, B])(f: B => Xor[A, C]): Xor[A, C] = e flatMap f
+
+    def fold[A, B, X](e: Xor[A, B])(left: A => X, right: B => X): X = e.fold(left, right)
+
+    def left[A, B](a: A): Xor[A, B] = Xor left a
+
+    def leftMap[A, B, C](e: Xor[A, B])(f: A => C): Xor[C, B] = e leftMap f
+
+    def right[A, B](b: B): Xor[A, B] = Xor right b
+
+    def rightMap[A, B, C](e: Xor[A, B])(f: B => C): Xor[A, C] = e map f
+
+    def swap[A, B](e: Xor[A, B]): Xor[B, A] = e.swap
+  }
 
   implicit def traverse1[F[_]](implicit F: _root_.cats.Traverse[F]): Traverse[F] = new Traverse[F] {
     def map[A, B](fa: F[A])(f: A => B): F[B] = F.map(fa)(f)
