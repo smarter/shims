@@ -157,6 +157,7 @@ lazy val core = crossProject
       "org.typelevel" %%% "cats-core"   % CatsVersion,
       "org.typelevel" %%% "cats-free"   % CatsVersion,
       "org.scalaz"    %%% "scalaz-core" % ScalazVersion,
+      "ch.epfl.lamp"  %%  "dotty-library" % "0.5.0-bin-SNAPSHOT-nonbootstrapped",
 
       "com.chuusai"   %%% "shapeless"   % "2.3.2",
 
@@ -169,6 +170,10 @@ lazy val coreJS = core.js
 
 lazy val dottyThing = project
   .dependsOn(coreJVM)
+  .settings(
+    projectDependencies ~= (_.map(_.withDottyCompat())),
+    scalaVersion := "0.5.0-bin-SNAPSHOT"
+  )
 
 enablePlugins(GitVersioning)
 
